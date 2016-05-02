@@ -39,9 +39,7 @@ Firebase rules
         only be able to enter themselves once but
         can overwrite that same record over and over
         there is no way to enforce that from here
-        with out authenticating an action by updating
-        a table without providing client a private rsa
-        key and interacting with firebase from server
+        with out authenticating an action on vps
         ######################################*/
         ".read": "auth !== null
           && (($user_id === auth.uid) 
