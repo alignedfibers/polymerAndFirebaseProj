@@ -1,4 +1,7 @@
 {
+/******************
+Firebase rules
+**************************/
   "rules": {
     ".read": false,
     ".write": false,
