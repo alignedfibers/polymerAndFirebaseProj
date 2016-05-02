@@ -1,3 +1,7 @@
+/*********
+ * Main.js
+ * ************/
+
 json = window.JSON;
 function obj(){}
 function addKeyVal(key, val, obj){
