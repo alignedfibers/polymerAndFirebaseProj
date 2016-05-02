@@ -26,7 +26,7 @@ var exposed = null;
    **********************************/
   app.firebaseAuth = document.querySelector('firebase-auth');
   //Some of these are not needed they are set in the markup
-  app.firebaseURL = 'https://crosscut.firebaseio.com';
+  app.firebaseURL = 'https://example.firebaseio.com';
   app.firebaseProvider = 'google'; // We will send this in the function call
   
   /**********
@@ -118,7 +118,7 @@ var exposed = null;
     console.log("this is the auth data"+json.stringify(app.firebaseAuth.user));
     //Only create the references we need, the remaining will be constructed
     //from data supplied to the users permission level.
-    this.ref = new Firebase('https://crosscut.firebaseio.com');  
+    this.ref = new Firebase('https://example.firebaseio.com');  
     this.refUserId = this.ref.child('users/'+app.firebaseAuth.user.uid);
     this.refUserId_IdValue = this.ref.child('users/'+app.firebaseAuth.user.uid+'/idValue');
     this.refUserId_IdValue.once('value', function (dataSnapshot) {
