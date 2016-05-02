@@ -215,17 +215,3 @@ Firebase rules
     }
   }  
 }
-
-/*
-I am concerned that if I listen to
-        //events from my server and try to update the counts after the 
-        //action, multiple more updates can be made before my server 
-        //catches up, this will leave a window where the client machine
-        //can and will push this to the limit - if I have a specific
-        //requirement to restrict to a certain number of children at this
-        //time I will have to send a request to my own data services
-        //and complete the update from there. Firebase is helpful in offloading
-        //my storage and providing a base template for me to work from inc
-        //configuring my own setup, right now we count. simple add new child 
-        //static property, so why can't the object emerge
-*/
