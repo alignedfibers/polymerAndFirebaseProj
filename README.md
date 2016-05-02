@@ -12,4 +12,5 @@ Instructions:
 
 This entirety of firebase-element is not in bower
 also a simple correction was necassary to make it work
- 
+
+###
