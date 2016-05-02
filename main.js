@@ -174,8 +174,8 @@ var exposed = null;
 
   app.addItem = function(event) {
     event.preventDefault(); // Don't send the form!
-    countRef = new Firebase('https://crosscut.firebaseio.com/items/'+app.firebaseAuth.user.uid+'/count');
-    countRef.transaction(function (count) {
+    this.itemCountRef = new Firebase('https://crosscut.firebaseio.com/items/'+app.firebaseAuth.user.uid+'/count');
+    this.itemCountRef.transaction(function (count) {
       return (count || 0) + 1;
     });
     this.refUserItems.push({
