@@ -24,6 +24,6 @@ Rational:
 The entirety of firebase-element is not in bower
 also a simple correction was necassary to make it work
 
-An initial start to using a custom element as well as 
+This is an initial start to using a custom element as well as 
 staging specific functionality for a firebase application
 #######
