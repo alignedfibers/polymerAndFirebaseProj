@@ -23,7 +23,7 @@ var exposed = null;
   var app = document.querySelector('#app');
   exposed = app;
   /*******************************
-   * The version I am using does not fire 
+   * Version of Polymer here does not fire 
    * webcomponents ready, The following should
    * be initialized after components are ready
    * The version on the server works for 
