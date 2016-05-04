@@ -132,7 +132,7 @@ var exposed = null;
           }else{
             var userObj = new obj();
             addKeyVal('idValue', app.firebaseAuth.user.uid, userObj);
-            addKeyVal('permGroup','user',userObj);
+            //addKeyVal('permGroup','user',userObj);
             app.refUserId.update(userObj,function(err){
               if(err === null){app.startListeningToUser();}
               else{
@@ -198,6 +198,31 @@ var exposed = null;
   
   app.deleteItem = function(event) {
     this.refUserItems.child(event.model.item.uid).remove();
+  };
+  
+  app.addPermissionGroup = function(){
+    //only someone with systemadmin group
+    //will be able to enhance to change
+    //permissions, this individual must
+    //complete actions within a time range
+    //declared on the client function enhance Permission
+    //default permissions given to a systemadmin
+    //are admin, they are able to enhance with
+    //current authentication, no reauth needed
+    //the list of references accessable will be
+    //changed on enhancement. To change permission
+    //the system admin must enter a valid json
+    //object in the textbox on first implimentation
+    //They will be able to create new groups and 
+    //add individuals to groups... a subsystem
+    //admin group will eventually be available for
+    //more granular permissions, subadmin will
+    //be restricted in what permissions they can
+    //give, this is because system admin does not 
+    //want to do everything and a client owner
+    //should be able to give perms to other users
+    //to manage the accounts that they are current
+    //primary gentleman or lady on.
   };
 
   

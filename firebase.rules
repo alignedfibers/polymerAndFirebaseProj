@@ -1,7 +1,4 @@
 {
-/******************
-Firebase rules
-**************************/
   "rules": {
     ".read": false,
     ".write": false,
@@ -39,7 +36,9 @@ Firebase rules
         only be able to enter themselves once but
         can overwrite that same record over and over
         there is no way to enforce that from here
-        with out authenticating an action on vps
+        with out authenticating an action by updating
+        a table without providing client a private rsa
+        key and interacting with firebase from server
         ######################################*/
         ".read": "auth !== null
           && (($user_id === auth.uid) 
@@ -50,9 +49,9 @@ Firebase rules
           && newData.child('idValue').val() === auth.uid 
           && $user_id === auth.uid) ) 
           || root.child('users/'+auth.uid+'/permGroup').val() === 'admin'",
-          ".validate": "newData.hasChildren(['idValue','permGroup'])",
+          ".validate": "newData.hasChildren(['idValue'])",
           "idValue":{".validate": "newData.isString()"},
-          "permGroup":{".validate": "newData.isString()"},
+          "permGroup":{".write": false,".validate": "newData.isString()"},
           "contactId":{".validate": "newData.isString()"},
           "$restricted": {//This catches all children not declared
             ".validate": false
@@ -201,17 +200,37 @@ Firebase rules
 && root.child('items/'+$userId+'/itemcount').val() < root.child('constants/itemsPerUser').val()
 || (auth !== null && root.child('users/'+auth.uid+'/permGroup').val() === 'admin')",
 ********************************************/
-        
-        "$item":{
-          //inherits permissions from parent 
-          "done":{},
-          "text":{".validate": "newData.isString()"},
-          "$restricted": {//This catches all children not declared
-          ".validate": false
+        "items":{
+          "$item":{
+            //inherits permissions from parent 
+            "done":{},
+            "text":{".validate": "newData.isString()"},
+            "$restricted": {//This catches all children not declared
+            ".validate": false
+            }
           }
-        }
-      }
-      
+        },
+        "$restricted": {//This catches all children not declared
+            ".validate": false
+          }
+      }   
+    },
+    "$restricted": {//This catches all children not declared
+      ".validate": false
     }
   }  
 }
+
+/*
+I am concerned that if I listen to
+        //events from my server and try to update the counts after the 
+        //action, multiple more updates can be made before my server 
+        //catches up, this will leave a window where the client machine
+        //can and will push this to the limit - if I have a specific
+        //requirement to restrict to a certain number of children at this
+        //time I will have to send a request to my own data services
+        //and complete the update from there. Firebase is helpful in offloading
+        //my storage and providing a base template for me to work from inc
+        //configuring my own setup, right now we count. simple add new child 
+        //static property, so why can't the object emerge
+*/
