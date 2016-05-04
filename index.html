@@ -9,7 +9,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
 
   <script src="bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
-  
+
   <link rel="import" href="bower_components/iron-icons/iron-icons.html">
   <link rel="import" href="bower_components/paper-toolbar/paper-toolbar.html">
   <!-- <link rel="import" href="bower_components/font-roboto/roboto.html"> -->
@@ -20,8 +20,8 @@
   <link rel="import" href="bower_components/paper-tabs/paper-tabs.html">
   <link rel="import" href="bower_components/paper-toast/paper-toast.html">
   
-  <link rel="import" href="bower_components/firebase-element/firebase-auth.html">
-  <link rel="import" href="bower_components/firebase-element/firebase.html">
+  <link rel="import" href="firebase-element/firebase-auth.html">
+  <link rel="import" href="firebase-element/firebase.html">
   <link rel="import" href="bower_components/paper-input/paper-input.html">
 
   <link rel="stylesheet" href="styles.css">
@@ -32,7 +32,6 @@
 <template is="dom-bind" id="app">
   
       <firebase-auth
-        redirect
         location="[[firebaseURL]]"
         provider="[[firebaseProvider]]"
         on-error="onFirebaseError"

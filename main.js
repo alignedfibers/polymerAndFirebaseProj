@@ -31,7 +31,7 @@ var exposed = null;
    **********************************/
   app.firebaseAuth = document.querySelector('firebase-auth');
   //Some of these are not needed they are set in the markup
-  app.firebaseURL = 'https://example.firebaseio.com';
+  app.firebaseURL = 'https://crosscut.firebaseio.com';
   app.firebaseProvider = 'google'; // We will send this in the function call
   
   /**********
@@ -94,7 +94,7 @@ var exposed = null;
         //the refs as well as the ons functions that keep our data synced will
         //be processed from this list setting the basic need of user. we will
         //sublist or do something later if the reload performance is a big deal
-        app.refUserItems = app.ref.child('items/'+app.firebaseAuth.user.uid); //test data
+        app.refUserItems = app.ref.child('items/'+app.firebaseAuth.user.uid+'/items'); //test data
         app.refUserItems.on('value', function (itemsSnapshot) {
           app.updateItems(itemsSnapshot);
         });
@@ -123,7 +123,7 @@ var exposed = null;
     console.log("this is the auth data"+json.stringify(app.firebaseAuth.user));
     //Only create the references we need, the remaining will be constructed
     //from data supplied to the users permission level.
-    this.ref = new Firebase('https://example.firebaseio.com');  
+    this.ref = new Firebase('https://crosscut.firebaseio.com');  
     this.refUserId = this.ref.child('users/'+app.firebaseAuth.user.uid);
     this.refUserId_IdValue = this.ref.child('users/'+app.firebaseAuth.user.uid+'/idValue');
     this.refUserId_IdValue.once('value', function (dataSnapshot) {
@@ -179,7 +179,7 @@ var exposed = null;
 
   app.addItem = function(event) {
     event.preventDefault(); // Don't send the form!
-    this.itemCountRef = new Firebase('https://crosscut.firebaseio.com/items/'+app.firebaseAuth.user.uid+'/count');
+   this.itemCountRef = new Firebase('https://crosscut.firebaseio.com/items/'+app.firebaseAuth.user.uid+'/count');
     this.itemCountRef.transaction(function (count) {
       return (count || 0) + 1;
     });
