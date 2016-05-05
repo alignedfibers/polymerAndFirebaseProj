@@ -7,7 +7,12 @@
       //As constants are needed for logical operations and security
       //and write once forget it values. We will add them
       ######################################*/
-      ".validate": "newData.hasChildren(['contactsPerClient'])"
+      ".validate": "newData.hasChildren(['contactsPerClient'])",
+      "contactsPerClient": {},
+      "itemsPerUser":{},
+      "$restricted": {//This catches all children not declared
+        ".validate": false
+      }
     },
     "users":{
       /***************************************************
@@ -21,7 +26,7 @@
         /*********************************************
         Important this rule must check an admin list
         for existance in admin, this list must only
-        be accessable by an admin
+        be accessable by a systemadmin
         *****************************/
         || root.child('users/'+auth.uid+'/permGroup').val() === 'admin'    )",
 
@@ -51,7 +56,20 @@
           || root.child('users/'+auth.uid+'/permGroup').val() === 'admin'",
           ".validate": "newData.hasChildren(['idValue'])",
           "idValue":{".validate": "newData.isString()"},
-          "permGroup":{".write": false,".validate": "newData.isString()"},
+          "permGroup":{
+            //Because we cannot deny permissions given from parent
+            //we will not be able to restrict on perm group because the user can write
+            //To ensure permission the client will need to itteratively
+            //try to access their user in permissionsgrouplist
+            //We will update the permission group here and make that
+            //the first one we check before itterating throught the others.
+            //user may only belong to one group -- we will build subgroups
+            //under the client to give limited access directly on clients
+            //where current clientowner can add permission to other users
+            //via a unique id for the request presented on screen to clientowner
+            //the new user must enter to gain access.
+            ".read": false,".write": false,".validate": "newData.isString()"
+          },
           "contactId":{".validate": "newData.isString()"},
           "$restricted": {//This catches all children not declared
             ".validate": false
@@ -99,6 +117,9 @@
             ##########################################*/
             "_clientIdVal":{".write":"newData.exists() && (!data.exists() || data.exists()) && root.child('users/'+auth.uid).exists()"},
             "$clientId":{"idValue":{".read": false,".write":false}}
+          },
+          "$restricted": {//This catches all children not declared
+            ".validate": false
           }
       } 
     },
@@ -131,8 +152,10 @@
                    && newData.child('state').isString() 
                    && newData.child('zip').isString() 
                    && newData.child('timestamp').isNumber()"
-        }
-  
+        },
+        "$restricted": {//This catches all children not declared
+          ".validate": false
+        } 
       }
     },
     "properties":{
@@ -214,6 +237,24 @@
             ".validate": false
           }
       }   
+    },
+    "permissionGroups":{
+      "systemadmin":{
+        "userlist":{
+        },
+        "referencepaths":{
+        },
+        "enhancedreferencepaths":{
+        },
+        "$restricted": {//This catches all children not declared
+        ".validate": false
+        }
+      },
+      "datamanagement":{},
+      "businessmanagement":{},
+      "$restricted": {//This catches all children not declared
+      ".validate": false
+      }
     },
     "$restricted": {//This catches all children not declared
       ".validate": false
