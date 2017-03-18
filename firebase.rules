@@ -2,6 +2,10 @@
   "rules": {
     ".read": false,
     ".write": false,
+    "admins":{
+      ".read": false,
+      ".write": false
+    },
     "constants":{
       /*############################################
       //As constants are needed for logical operations and security
@@ -19,7 +23,7 @@
       The solution to permissions issues, admin
       **********************************************/
       ".read": "auth !== null 
-        && root.child('users/'+auth.uid+'/permGroup').val() === 'admin'",
+        && root.child('admins/'+auth.uid).exists()",
       ".write": "auth !== null  
         && (   (newData.child(auth.uid).exists()
         && !root.child('users/'+auth.uid).exists())
@@ -28,9 +32,7 @@
         for existance in admin, this list must only
         be accessable by a systemadmin
         *****************************/
-        || root.child('users/'+auth.uid+'/permGroup').val() === 'admin'    )",
-
-        
+        || root.child('admins/'+auth.uid).exists()   )",
       "$user_id":{
         /*############################################
         The following read/write rules cascade from parent
@@ -47,15 +49,16 @@
         ######################################*/
         ".read": "auth !== null
           && (($user_id === auth.uid) 
-          || root.child('users/'+auth.uid+'/permGroup').val() === 'admin')",
+          || root.child('admins/'+auth.uid).exists() )",
         ".write": "auth !== null  
           && (   (!newData.child(auth.uid).exists()
           && root.child('users/'+auth.uid).exists()
-          && newData.child('idValue').val() === auth.uid 
+          && newData.child('idValue').val() === auth.uid
           && $user_id === auth.uid) ) 
-          || root.child('users/'+auth.uid+'/permGroup').val() === 'admin'",
+          || root.child('admins/'+auth.uid).exists()",
           ".validate": "newData.hasChildren(['idValue'])",
           "idValue":{".validate": "newData.isString()"},
+          "referralCount":{},
           "permGroup":{
             //Because we cannot deny permissions given from parent
             //we will not be able to restrict on perm group because the user can write
@@ -74,23 +77,23 @@
           "$restricted": {//This catches all children not declared
             ".validate": false
           }
-      }    
+      }
     },
     "contacts":{
-      ".read": "auth !== null 
-        && root.child('users/'+auth.uid+'/permGroup').val() === 'admin'",
+      ".read": "auth !== null
+        && root.child('admins/'+auth.uid).exists()",
       ".write": "(auth !== null 
-        && (newData.exists() && !data.exists()) && root.child('users/'+auth.uid).exists()              
+        && (newData.exists() && !data.exists()) && root.child('users/'+auth.uid).exists()
         && root.child('clients/'+ newData.child('clientids/_clientIdVal').val()+'/contactCount').val() < root.child('constants/contactsPerClient').val())
-        || (auth !== null && root.child('users/'+auth.uid+'/permGroup').val() === 'admin')",
+        || (auth !== null && root.child('admins/'+auth.uid).exists())",
       "$contactId":{
         /*#############################################
         Important contactId cannot be written to without
         a clientIdVal in newData that already exists in clients/
-        ##########################################*/        
+        ##########################################*/
         ".validate": "newData.hasChildren(['ownerUserId','fname','lname','phone','email','timestamp','clientids','clientIdVal'])",
-        ".write":"auth !== null 
-          && newData.exists() 
+        ".write":"auth !== null
+          && newData.exists()
           && (!data.exists() || data.exists()) 
           && root.child('users/'+auth.uid).exists()
           && newData.child('_clientIdVal').exists()
@@ -124,26 +127,26 @@
       } 
     },
     "clients":{
-      ".read": "auth !== null 
-      && root.child('users/'+auth.uid+'/permGroup').val() === 'admin'",
-      ".write": "auth !== null  
+      ".read": "auth !== null
+      && root.child('admins/'+auth.uid).exists()",
+      ".write": "auth !== null
       && (root.child('users/'+auth.uid).exists()
-      || root.child('users/'+auth.uid+'/permGroup').val() === 'admin')",
+      || root.child('admins/'+auth.uid).exists())",
 
       "$clientId":{
         ".read": "auth !== null
         && ((root.child('clients/'+$clientId+'/ownerUserId').exists() 
         && root.child('clients/'+$clientId+'/ownerUserId').val() === auth.uid) 
-        || root.child('users/'+auth.uid+'/permGroup').val() === 'admin')",
+        || root.child('admins/'+auth.uid).exists())",
         ".write": "auth !== null  
         && (   (newData.child('contactId').exists()
         && root.child('users/'+auth.uid).exists()
-        && newData.child('ownerUserId').val() === auth.uid) ) 
-          || root.child('users/'+auth.uid+'/permGroup').val() === 'admin'",
+        && newData.child('ownerUserId').val() === auth.uid) )
+          || root.child('admins/'+auth.uid).exists()",
         "ownerUserId":{},
         "primaryContactId":{},
         "properties":{
-          "$propertyId":{"idValue":{}}  
+          "$propertyId":{"idValue":{}}
         },
         "billsTo":{".validate": "newData.hasChildren(['name','addr','city','state','zip'])
                    && newData.child('name').isString()
@@ -155,16 +158,16 @@
         },
         "$restricted": {//This catches all children not declared
           ".validate": false
-        } 
+        }
       }
     },
     "properties":{
       "$propertyId":{".validate": "newData.hasChildren(['addr','city','state','zip','timestamp']) 
-                  && newData.child('propstaddr').isString() 
-                  && newData.child('propcity').isString() 
-                  && newData.child('propstate').isString() 
-                  && newData.child('propzip').isString() 
-                  && newData.child('timestamp').isNumber()"       
+                  && newData.child('propstaddr').isString()
+                  && newData.child('propcity').isString()
+                  && newData.child('propstate').isString()
+        					&& newData.child('propzip').isString()
+                  && newData.child('timestamp').isNumber()"
       }
     },
     "contracts":{
@@ -174,15 +177,15 @@
                   && newData.child('addedToContractOn').isNumber()",
             "services":{
               "$serviceId":{".validate": "newData.hasChildren(['heading','description','billingcycle','itemcharge','category'])"}
-            }      
+            }
           }
         }
-      }    
+      }
     },
     "pricingrequests":{
       "$request":{".validate": "newData.hasChildren(['$clientId','propertyId','services'])",
         "services":{
-          "$service":{".validate": "newData.hasChildren(['heading','description','category'])"} 
+          "$service":{".validate": "newData.hasChildren(['heading','description','category'])"}
         }
       } 
     },
@@ -192,34 +195,32 @@
       "$userId":{
         ".read": false,
         ".write": true
-          
-      }  
+      }
     },
     "items":{
       ".read": "auth !== null 
-        && root.child('users/'+auth.uid+'/permGroup').val() === 'admin'",
+        && root.child('admins/'+auth.uid).exists()",
       ".write": "auth !== null  
         && (   (newData.child(auth.uid).exists()
         && !root.child('items/'+auth.uid).exists())
-        || root.child('users/'+auth.uid+'/permGroup').val() === 'admin'    )",
+        || root.child('admins/'+auth.uid).exists()    )",
 
       "$userId":{
-        
         ".read": "auth !== null
-        && (($userId === auth.uid) 
-        || root.child('users/'+auth.uid+'/permGroup').val() === 'admin')",
-        ".write": "auth !== null  
+        && (($userId === auth.uid)
+        || root.child('admins/'+auth.uid).exists())",
+        ".write": "auth !== null
         && (   !newData.child(auth.uid).exists()
         && root.child('users/'+auth.uid).exists()
         && root.child('items/'+auth.uid).exists()
-        && $userId === auth.uid ) 
-        || root.child('users/'+auth.uid+'/permGroup').val() === 'admin'",
+        && $userId === auth.uid )
+        || root.child('admins/'+auth.uid).exists()",
         //Unfortunately we cannot restrict the number of items without
         //a counter - in this case the counter must be updated from a client
         //with a transaction call from client machine
         "count":{},
 /****************************************
-".write": "(auth !== null             
+".write": "(auth !== null
 && root.child('items/'+$userId+'/itemcount').val() < root.child('constants/itemsPerUser').val()
 || (auth !== null && root.child('users/'+auth.uid+'/permGroup').val() === 'admin')",
 ********************************************/
@@ -236,22 +237,114 @@
         "$restricted": {//This catches all children not declared
             ".validate": false
           }
-      }   
+      }
+    },
+    "referrals2":{
+      /***************************************************
+      A single referral will be keyed on the unique user id
+      **********************************************/
+      ".read": "auth !== null 
+        && root.child('admins/'+auth.uid).exists()",
+      ".write": "auth !== null  
+        && (   (newData.child(auth.uid).exists()
+        && !root.child('users/'+auth.uid).exists())
+        /*********************************************
+        Important this rule must check an admin list
+        for existance in admin, this list must only
+        be accessable by a systemadmin
+        *****************************/
+        || root.child('admins/'+auth.uid).exists()   )",
+      "$user_id":{
+        "userId":{".read": false, ".validate": "newData.val() === auth.uid"},
+        "displayName":{".validate": "newData.isString()"},
+        "text":{".validate": "newData.isString()"},
+        "$restricted": {
+         ".validate": false
+        }
+      }
+    },
+    "referrals":{
+      ".read": true,
+        /**/
+      ".write": false,
+      "$referralId":{
+        "userId":{".validate": "newData.val() === auth.uid"},
+        "displayName":{".validate": "newData.isString()"},
+        "text":{".validate": "newData.isString()"},
+        "$restricted": {
+         ".validate": false
+        }
+      }
     },
     "permissionGroups":{
+      ".read":"auth !== null",
+      ".write":false,
       "systemadmin":{
+        ".read":false,
+        ".write":false,
         "userlist":{
+          "$user_id":{
+            ".read":"auth !== null
+            && root.child('permissionGroups/systemadmin/userlist/'+auth.uid).exists()",
+            ".write":false,
+            "hasPerm":{
+              "$restricted": {//This catches all children not declared
+                ".validate": false
+              }
+            },
+            "$restricted": {//This catches all children not declared
+              ".validate": false
+            }
+          }
         },
         "referencepaths":{
+          "$paths":{}
         },
         "enhancedreferencepaths":{
+          "$paths":{}
         },
         "$restricted": {//This catches all children not declared
         ".validate": false
         }
       },
-      "datamanagement":{},
-      "businessmanagement":{},
+      "datamanagement":{
+        "userlist":{
+          "$user_id":{
+            "hasPerm":{},
+            "$restricted": {//This catches all children not declared
+              ".validate": false
+            }
+          }
+        },
+        "referencepaths":{
+          "$paths":{}
+        },
+        "enhancedreferencepaths":{
+          "$paths":{}
+        },
+        "$restricted": {//This catches all children not declared
+        ".validate": false
+        }  
+      },
+      "businessmanagement":{
+        "userlist":{
+          "$user_id":{
+            "hasPerm":{},
+            "$restricted": {//This catches all children not declared
+              ".validate": false
+            }
+          }
+        },
+        "referencepaths":{
+          "$paths":{}
+        },
+        "enhancedreferencepaths":{
+          "$paths":{}
+        },
+        "$restricted": {//This catches all children not declared
+        ".validate": false
+        }
+      },
       "$restricted": {//This catches all children not declared
       ".validate": false
       }
@@ -259,7 +352,7 @@
     "$restricted": {//This catches all children not declared
       ".validate": false
     }
-  }  
+  }
 }
 
 /*
